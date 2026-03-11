@@ -17,10 +17,18 @@ builder.Services.AddScoped<IDbConnection>(sp =>
 // Register repositories
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<ICostCenterRepository, CostCenterRepository>();
+
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 
 // Register services
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<ICostCenterService, CostCenterService>();
+
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 // CORS configuration
 builder.Services.AddCors(options =>

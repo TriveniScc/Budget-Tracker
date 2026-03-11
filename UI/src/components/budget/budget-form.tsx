@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { CreateBudgetRequest, CreateBudgetCategoryRequest, Project } from '../../types/budget';
+import { CreateBudgetRequest, CreateBudgetCategoryRequest, Project, CostCenter } from '../../types/budget';
 import { budgetService } from '../../services/budget-service';
 import { projectService } from '../../services/project-service';
+import { costCenterService } from '../../services/cost-center-service';
 import './budget-form.css';
+
 
 
 interface BudgetFormProps {
@@ -33,7 +35,10 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({ onSuccess, onCancel }) =
   const [error, setError] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
+  const [loadingCostCenters, setLoadingCostCenters] = useState(true);
 
+  // Fetch projects on component mount
   // Fetch projects on component mount
   useEffect(() => {
     const fetchProjects = async () => {
@@ -53,6 +58,25 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({ onSuccess, onCancel }) =
 
     fetchProjects();
   }, []);
+
+  // Fetch cost centers on component mount
+  useEffect(() => {
+    const fetchCostCenters = async () => {
+      try {
+        setLoadingCostCenters(true);
+        const costCenterList = await costCenterService.getAllCostCenters();
+        setCostCenters(costCenterList);
+      } catch (err) {
+        console.error('Failed to fetch cost centers:', err);
+        setError('Failed to load cost centers. Please refresh the page.');
+      } finally {
+        setLoadingCostCenters(false);
+      }
+    };
+
+    fetchCostCenters();
+  }, []);
+
 
 
 
@@ -220,17 +244,26 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({ onSuccess, onCancel }) =
             </div>
 
             <div className="form-group">
-              <label htmlFor="costCenterID">Cost Center ID *</label>
-              <input
-                type="text"
+              <label htmlFor="costCenterID">Cost Center *</label>
+              <select
                 id="costCenterID"
                 name="costCenterID"
                 value={formData.costCenterID}
                 onChange={handleInputChange}
                 required
-                placeholder="Cost Center GUID"
-          <div className="form-row">
-            <div className="form-group">
+                disabled={loadingCostCenters}
+              >
+                <option value="">
+                  {loadingCostCenters ? 'Loading cost centers...' : 'Select a cost center'}
+                </option>
+                {costCenters.map((costCenter) => (
+                  <option key={costCenter.id} value={costCenter.id}>
+                    {costCenter.name} ({costCenter.code})
+                  </option>
+                ))}
+              </select>
+            </div>
+
               <label htmlFor="projectID">Project *</label>
               <select
                 id="projectID"
