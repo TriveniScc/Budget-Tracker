@@ -1,0 +1,48 @@
+# SQL Server Database Project build outputs
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Database project outputs
+*.dacpac
+*.publish.xml
+*.jfm
+
+# Visual Studio cache/options
+.vs/
+*.dbmdl
+*.dbproj.schemaview
+
+# SQL Server files
+*.mdf
+*.ldf
+*.ndf
+
+# Backup files
+*.bak
+*.BAK
+
+# Local publish profiles
+*.publish.xml
+*_Local.publish.xml
+
+# SSDT Temp files
+*.refactorlog
+*.sqlproj.user
