@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { CreateBudgetRequest, CreateBudgetCategoryRequest } from '../../types/budget';
+import React, { useState, useEffect } from 'react';
+import { CreateBudgetRequest, CreateBudgetCategoryRequest, Project } from '../../types/budget';
 import { budgetService } from '../../services/budget-service';
+import { projectService } from '../../services/project-service';
 import './budget-form.css';
+
 
 interface BudgetFormProps {
   onSuccess?: () => void;
@@ -29,6 +31,30 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({ onSuccess, onCancel }) =
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+
+  // Fetch projects on component mount
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoadingProjects(true);
+        const projectList = await projectService.getAllProjects();
+        // Filter only active projects
+        const activeProjects = projectList.filter(p => p.isActive);
+        setProjects(activeProjects);
+      } catch (err) {
+        console.error('Failed to fetch projects:', err);
+        setError('Failed to load projects. Please refresh the page.');
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -52,13 +78,14 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({ onSuccess, onCancel }) =
       return updated;
     });
   };
-
-  const addCategory = () => {
-    setCategories((prev) => [
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      { categoryName: '', allocatedAmount: 0, description: '' },
-    ]);
+      [name]: name === 'totalAmount' ? parseFloat(value) || 0 : value,
+    }));
   };
+
 
   const removeCategory = (index: number) => {
     if (categories.length > 1) {
@@ -202,19 +229,28 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({ onSuccess, onCancel }) =
                 onChange={handleInputChange}
                 required
                 placeholder="Cost Center GUID"
-              />
-            </div>
-          </div>
-
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="startDate">Start Date *</label>
-              <input
-                type="date"
-                id="startDate"
-                name="startDate"
-                value={formData.startDate}
+              <label htmlFor="projectID">Project *</label>
+              <select
+                id="projectID"
+                name="projectID"
+                value={formData.projectID}
                 onChange={handleInputChange}
+                required
+                disabled={loadingProjects}
+              >
+                <option value="">
+                  {loadingProjects ? 'Loading projects...' : 'Select a project'}
+                </option>
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.projectName} ({project.projectCode})
+                  </option>
+                ))}
+              </select>
+            </div>
+
                 required
               />
             </div>

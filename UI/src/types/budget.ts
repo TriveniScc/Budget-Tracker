@@ -25,10 +25,18 @@ export interface BudgetCategory {
 }
 
 /**
- * Project model
+ * Project model matching API structure
  */
 export interface Project {
   id: string; // GUID
+  projectCode: string;
+  projectName: string;
+  description?: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
   name: string;
   description?: string;
 }
